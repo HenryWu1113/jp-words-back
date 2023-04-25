@@ -44,14 +44,25 @@ export const login = async (req, res) => {
       expiresIn: '7 days'
     })
     req.user.tokens.push(token)
+    console.log(req.user)
     await req.user.save()
-    res.status(200).json({ success: true, message: '', result: req.user })
+    res.status(200).json({
+      success: true,
+      message: '',
+      result: {
+        account: req.user.account,
+        likes: req.user.likes,
+        token,
+        role: req.user.role
+      }
+    })
   } catch (error) {
     console.log(error)
   }
 }
 
 export const logout = async (req, res) => {
+  console.log(req.token)
   try {
     req.user.tokens = req.user.tokens.filter((item) => item !== req.token)
     await req.user.save()
@@ -61,6 +72,32 @@ export const logout = async (req, res) => {
   }
 }
 
-export const extend = async (req, res) => {}
+export const extend = async (req, res) => {
+  try {
+    const idx = req.user.tokens.findIndex((item) => item === req.user.token)
+    const token = jwt.sign({ _id: req.user._id }, process.env.JWT_SECRET, {
+      expiresIn: '7 days'
+    })
+    req.user.tokens[idx] = token
+    await req.user.save()
+    res.status(200).json({ success: true, message: '', result: token })
+  } catch (error) {
+    res.status(500).json({ success: false, message: '伺服器錯誤' })
+  }
+}
 
-export const getUser = async (req, res) => {}
+export const getUser = async (req, res) => {
+  try {
+    res.status(200).send({
+      success: true,
+      message: '',
+      result: {
+        account: req.user.account,
+        likes: req.user.likes,
+        role: req.user.role
+      }
+    })
+  } catch (error) {
+    res.status(500).send({ success: false, message: '伺服器錯誤' })
+  }
+}

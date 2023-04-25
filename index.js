@@ -6,6 +6,11 @@ import './passport/passport.js'
 
 mongoose.connect(process.env.DB_URL)
 const app = express()
+
+app.use((_, req, res, next) => {
+  res.status(400).send({ success: false, message: '請求被拒' })
+})
+
 app.use(express.json())
 
 app.use('/users', userRoute)
