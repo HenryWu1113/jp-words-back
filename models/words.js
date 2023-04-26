@@ -9,6 +9,7 @@ const wordSchema = new mongoose.Schema(
       minlength: 1
     },
     hiragana: {
+      type: String,
       required: [true, '必填喔'],
       minlength: 1
     },
